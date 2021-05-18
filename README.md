@@ -1,7 +1,7 @@
 Simple [Obsidian](https://obsidian.md) plugin to automatically update the progress in a list of
 tasks. Given, for example, the following note:
 
-```md
+```markdown
 This is a list (/):
 - [x] item one
 - [ ] item two (%)
@@ -12,7 +12,7 @@ This is a list (/):
 
 the command provided by this plugin will update it to
 
-```md
+```markdown
 This is a list (2/3):
 - [x] item one
 - [ ] item two (50%)
