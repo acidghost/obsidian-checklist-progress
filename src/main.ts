@@ -1,3 +1,7 @@
+// (c) Copyright 2021, obsidian-checklist-progress Authors.
+//
+// Licensed under the terms of the GNU GPL License version 3.
+
 import { MarkdownView, Plugin } from "obsidian"
 
 export default class MyPlugin extends Plugin {

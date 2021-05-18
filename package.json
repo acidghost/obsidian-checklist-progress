@@ -2,14 +2,13 @@
   "name": "obsidian-checklist-progress",
   "version": "0.12.0",
   "description": "Plugin to automatically fill progress (as fraction or percentage) of check-lists.",
-  "main": "main.js",
+  "main": "build/main.js",
   "scripts": {
     "dev": "rollup --config rollup.config.js -w",
     "build": "rollup --config rollup.config.js --environment BUILD:production"
   },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
+  "keywords": ["obsidian-md", "obsidian-plugin"],
+  "license": "GPL-3.0-only",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^18.0.0",
     "@rollup/plugin-node-resolve": "^11.2.1",
