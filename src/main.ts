@@ -22,7 +22,7 @@ export default class MyPlugin extends Plugin {
 
     updateProgress(mdv: MarkdownView) {
         info(`updating progress in ${mdv.file.name}`);
-        const lines = mdv.getViewData().split("\n");
+        const lines = mdv.getViewData().split(/\r?\n/);
         if (lines.length < 2) return;
 
         let stack: ListProgress[] = [];
@@ -33,6 +33,7 @@ export default class MyPlugin extends Plugin {
             let replacement = p.type === "perc" ?
                 `${((p.checked / p.count) * 100).toFixed(0)}%` :
                 `${p.checked}/${p.count}`;
+            debug(`Replacing '${p.toReplace}' in '${lines[p.lineIdx]}' with '${replacement}'`)
             lines[p.lineIdx] = lines[p.lineIdx].replace(p.toReplace, `(${replacement})`);
             return p;
         };
@@ -45,10 +46,10 @@ export default class MyPlugin extends Plugin {
 
         let alreadyPushed = false;
         for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
-            if (line == "") {
-                if (stack.length > 0)
-                    while (popReplace());
+            const line = lines[i].trimEnd();
+            if (line.length == 0) {
+                debug("empty line");
+                while (popReplace());
                 continue;
             }
 
@@ -59,7 +60,7 @@ export default class MyPlugin extends Plugin {
             if (m = line.match(/^(\s*)[\*\+\-] \[(x| )\] .+/)) {
                 indent = m[1].length;
                 const checked = m[2] === "x";
-                debug(`list item (i=${indent}, c=${checked})`, line);
+                debug(`list item (s=${stack.length}, i=${indent}, c=${checked})`, line);
                 if (stack.length > 0) {
                     if (stack[stack.length - 1].indent > indent) {
                         // De-indenting list item
@@ -70,14 +71,14 @@ export default class MyPlugin extends Plugin {
                         if (alreadyPushed) {
                             increment(checked);
                         } else {
-                            stack.push({ indent, count: 0, checked: 0 });
+                            stack.push({ indent, count: 1, checked: checked ? 1 : 0 });
                         }
                     } else {
                         // Same indentation
                         increment(checked);
                     }
                 } else {
-                    stack.push({ indent, count: 0, checked: 0 });
+                    stack.push({ indent, count: 1, checked: checked ? 1 : 0 });
                 }
             }
             alreadyPushed = false;
@@ -90,6 +91,7 @@ export default class MyPlugin extends Plugin {
             }
 
             if (ty) {
+                debug(`tracking next checklist '${ty}'`);
                 stack.push({
                     indent: stack.length == 0 ? 0 : indent + 4,
                     lineIdx: i,
