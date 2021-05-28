@@ -5,11 +5,21 @@
 import { MarkdownView, Plugin } from "obsidian"
 
 import { debug, info } from "./utils"
+import { ChecklistProgressSettingsTab, DEFAULT_SETTINGS, ChecklistProgressSettings } from "./settings"
+import { EditorWrapper, CUSTOM_ORIGIN } from "./editor-wrapper"
 
 export default class ChecklistProgressPlugin extends Plugin {
 
+    settings: ChecklistProgressSettings;
+    private timeoutHandle: number | null = null;
+    private cmEditors: CodeMirror.Editor[] = [];
+
     async onload() {
         info("loading plugin");
+
+        await this.loadSettings();
+
+        this.addSettingTab(new ChecklistProgressSettingsTab(this.app, this));
 
         this.addCommand({
             id: "todo-prog-update",
@@ -20,12 +30,64 @@ export default class ChecklistProgressPlugin extends Plugin {
                 this.updateProgress(mdView);
             }
         });
+
+        if (this.settings.autoUpdateProgress) {
+            this.registerOnChanges();
+        }
     }
 
-    updateProgress(mdv: MarkdownView) {
-        info(`updating progress in ${mdv.file.name}`);
-        const lines = mdv.getViewData().split(/\r?\n/);
-        if (lines.length < 2) return;
+    async onunload() {
+        info("unloading plugin");
+        this.deregisterOnChanges();
+    }
+
+    async loadSettings() {
+        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    }
+
+    async saveSettings() {
+        await this.saveData(this.settings);
+        if (this.settings.autoUpdateProgress) {
+            this.registerOnChanges();
+        } else {
+            this.deregisterOnChanges();
+        }
+    }
+
+    private registerOnChanges() {
+        this.registerCodeMirror((cm) => {
+            debug("new CodeMirror", cm);
+            this.cmEditors.push(cm);
+            cm.on("changes", this.handleChanges);
+        });
+    }
+
+    private deregisterOnChanges() {
+        for (let cm of this.cmEditors) {
+            cm.off("changes", this.handleChanges);
+        }
+    }
+
+    private readonly handleChanges = (
+        cm: CodeMirror.Editor,
+        changes: CodeMirror.EditorChangeLinkedList[]
+    ) => {
+        for (let c of changes) {
+            if (c.origin === CUSTOM_ORIGIN) {
+                return false;
+            }
+        }
+        if (this.timeoutHandle !== null)
+            window.clearTimeout(this.timeoutHandle);
+        this.timeoutHandle = window.setTimeout(() => {
+            this.updateProgress(cm);
+        }, 1000);
+    }
+
+    private updateProgress(ed: MarkdownView | CodeMirror.Editor) {
+        const edW = new EditorWrapper(ed);
+        info(`updating progress in ${edW.fileName}`);
+        if (edW.linesCount < 2) return;
 
         let stack: ListProgress[] = [];
 
@@ -35,8 +97,8 @@ export default class ChecklistProgressPlugin extends Plugin {
             let replacement = p.type === "perc" ?
                 `${((p.checked / p.count) * 100).toFixed(0)}%` :
                 `${p.checked}/${p.count}`;
-            debug(`Replacing '${p.toReplace}' in '${lines[p.lineIdx]}' with '${replacement}'`)
-            lines[p.lineIdx] = lines[p.lineIdx].replace(p.toReplace, `(${replacement})`);
+            debug(`Replacing '${p.toReplace}' in '${edW.getLine(p.lineIdx)}' with '${replacement}'`)
+            edW.replace(p.lineIdx, p.toReplace, `(${replacement})`);
             return p;
         };
 
@@ -47,12 +109,11 @@ export default class ChecklistProgressPlugin extends Plugin {
         };
 
         let alreadyPushed = false;
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines[i].trimEnd();
+        edW.forEach((line, i) => {
             if (line.length == 0) {
                 debug("empty line");
                 while (popReplace());
-                continue;
+                return;
             }
 
             let m: RegExpMatchArray;
@@ -104,12 +165,11 @@ export default class ChecklistProgressPlugin extends Plugin {
                 });
                 alreadyPushed = true;
             }
-        }
+        });
 
         while (popReplace());
 
-        mdv.setViewData(lines.join("\n"), false);
-        mdv.save();
+        edW.save();
     }
 
 }
