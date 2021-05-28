@@ -4,7 +4,9 @@
 
 import { MarkdownView, Plugin } from "obsidian"
 
-export default class MyPlugin extends Plugin {
+import { debug, info } from "./utils"
+
+export default class ChecklistProgressPlugin extends Plugin {
 
     async onload() {
         info("loading plugin");
@@ -111,9 +113,6 @@ export default class MyPlugin extends Plugin {
     }
 
 }
-
-function debug(msg: string, ...args: any) { console.debug(`todo-prog: ${msg}`, ...args); }
-function info(msg: string, ...args: any) { console.info(`todo-prog: ${msg}`, ...args); }
 
 type ProcessingType = "perc" | "frac";
 

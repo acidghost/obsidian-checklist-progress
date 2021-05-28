@@ -20,6 +20,7 @@ export default {
     format: "cjs",
     exports: "default",
     banner,
+    intro: `const PROD = ${isProd};`
   },
   external: ["obsidian"],
   plugins: [
