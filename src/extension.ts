@@ -40,7 +40,10 @@ class Extension implements PluginValue {
         let idx = 0;
         const lines = [];
         for (const line of state.doc.iterLines()) {
-            lines.push({ txt: line, idx, target: targetLine.text == line });
+            lines.push({
+                txt: line, idx,
+                checked: targetLine.text == line ? target.checked : undefined
+            });
             idx++;
         }
 
