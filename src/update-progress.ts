@@ -9,8 +9,8 @@ type ProcessingType = "perc" | "frac";
 interface Line {
     txt: string
     idx: number
-    // Is this line the target of a click event on the live preview checkbox?
-    target?: boolean
+    // Used to override checked status when updating from a Live Preview
+    checked?: boolean
 }
 
 interface Change {
@@ -67,7 +67,7 @@ export default function(lines: Line[]): Change[] {
     };
 
     let alreadyPushed = false;
-    lines.forEach(({ txt: line, idx, target: isTarget }) => {
+    lines.forEach(({ txt: line, idx, checked: isLPChecked }) => {
         if (line.length == 0) {
             debug("empty line");
             while (popReplace());
@@ -82,10 +82,12 @@ export default function(lines: Line[]): Change[] {
         // Match list items
         if (m = line.match(/^(\s*)[*+-] \[([-x ])\] .+/)) {
             indent = m[1].length;
-            let checked = m[2] === "x" || m[2] === "-";
-            if (isTarget)
-                checked = !checked;
+
+            const checked = isLPChecked === undefined ?
+                (m[2] === "x" || m[2] === "-") : isLPChecked;
+
             debug(`list item (s=${stack.length}, i=${indent}, c=${checked})`, line);
+
             if (stack.length > 0) {
                 if (stack[stack.length - 1].indent > indent) {
                     // De-indenting list item
