@@ -1,9 +1,9 @@
 {
-	"id": "obsidian-checklist-progress",
+	"id": "checklist-progress",
 	"name": "Checklist Progress",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"minAppVersion": "1.5.0",
-	"description": "Plugin to automatically fill progress (as fraction or percentage) of check-lists.",
+	"description": "Automatically fill progress (as fraction or percentage) of check-lists.",
 	"author": "acidghost",
 	"isDesktopOnly": false
 }

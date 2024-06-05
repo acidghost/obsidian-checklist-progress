@@ -1,4 +1,4 @@
-// (c) Copyright 2021, obsidian-checklist-progress Authors.
+// (c) Copyright 2024, obsidian-checklist-progress Authors.
 //
 // Licensed under the terms of the GNU GPL License version 3.
 

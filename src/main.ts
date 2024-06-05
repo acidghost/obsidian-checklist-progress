@@ -1,4 +1,4 @@
-// (c) Copyright 2021, obsidian-checklist-progress Authors.
+// (c) Copyright 2024, obsidian-checklist-progress Authors.
 //
 // Licensed under the terms of the GNU GPL License version 3.
 
@@ -24,7 +24,7 @@ export default class ChecklistProgressPlugin extends Plugin {
         this.addSettingTab(new ChecklistProgressSettingsTab(this.app, this));
 
         this.addCommand({
-            id: "todo-prog-update",
+            id: "update",
             name: "update",
             editorCallback(ed: Editor) {
                 let idx = 0;
