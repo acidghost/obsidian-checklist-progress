@@ -24,7 +24,7 @@ export default class ChecklistProgressPlugin extends Plugin {
         this.addSettingTab(new ChecklistProgressSettingsTab(this.app, this));
 
         this.addCommand({
-            id: "todo-prog-update",
+            id: "update",
             name: "update",
             editorCallback(ed: Editor) {
                 let idx = 0;
