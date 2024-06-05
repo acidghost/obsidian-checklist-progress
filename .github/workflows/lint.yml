@@ -12,4 +12,4 @@ jobs:
       - name: Lint plugin
         run: |
           npm install
-          npx eslint src
+          npx eslint .

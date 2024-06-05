@@ -9,7 +9,7 @@ import updateProgress from "./update-progress"
 
 export default function() {
     return ViewPlugin.fromClass(Extension);
-};
+}
 
 class Extension implements PluginValue {
     private readonly view: EditorView;
