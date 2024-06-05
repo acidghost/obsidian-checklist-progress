@@ -4,7 +4,7 @@
 
 import { App, PluginSettingTab, Setting } from "obsidian"
 
-import ChecklistProgressPlugin from "./main"
+import type ChecklistProgressPlugin from "./main"
 import { debug } from "./utils";
 
 export interface ChecklistProgressSettings {
@@ -21,13 +21,13 @@ export class ChecklistProgressSettingsTab extends PluginSettingTab {
     }
 
     display() {
-        let { containerEl } = this;
+        const { containerEl } = this;
         containerEl.empty();
 
         new Setting(containerEl)
             .setName("Auto-update progress")
             .setDesc("Automatically updates checklist progress \
-                     in editor view on every change in the document.")
+                     in editor live preview on every checkbox click.")
             .addToggle((toggle) => toggle
                 .setValue(this.plugin.settings.autoUpdateProgress)
                 .onChange(async (value) => {
