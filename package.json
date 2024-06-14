@@ -1,6 +1,6 @@
 {
   "name": "obsidian-checklist-progress",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Plugin to automatically fill progress (as fraction or percentage) of check-lists.",
   "main": "build/main.js",
   "scripts": {
