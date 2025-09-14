@@ -81,7 +81,8 @@ export default function(lines: Line[]): Change[] {
 
         // Match list items
         if (m = line.match(/^(\s*)[*+-] \[([-x ])\] .+/)) {
-            indent = m[1].length;
+            // Treat tabs as 4 spaces for indentation
+            indent = m[1].replace(/\t/g, "    ").length;
 
             const checked = isLPChecked === undefined ?
                 (m[2] === "x" || m[2] === "-") : isLPChecked;
