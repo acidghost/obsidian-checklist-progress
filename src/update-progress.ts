@@ -90,9 +90,12 @@ export default function(lines: Line[]): Change[] {
 
             if (stack.length > 0) {
                 if (stack[stack.length - 1].indent > indent) {
-                    // De-indenting list item
+                    // De-indenting list item: pop nested progress markers
+                    // but leave list items on the stack so subsequent items
+                    // can increment them
+
                     // @ts-expect-error: undefined is fine
-                    while (popReplace()?.indent > indent + 4);
+                    while (stack.length > 0 && stack[stack.length - 1].type && stack[stack.length - 1].indent > indent + 4) popReplace();
                     increment(checked);
                 } else if (stack[stack.length - 1].indent < indent) {
                     // Indented list item
